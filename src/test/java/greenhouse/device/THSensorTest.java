@@ -26,6 +26,7 @@ public class THSensorTest {
     public void shouldThrowExceptionWhenCommandOutIsError() throws Exception {
         THSensor thSensor = spy(new THSensor("ERROR"));
         when(thSensor.getReadCommand()).thenReturn("echo");
+        when(thSensor.getRetryDelay()).thenReturn(0);
         thSensor.readData();
     }
 
@@ -33,6 +34,7 @@ public class THSensorTest {
     public void shouldThrowExceptionWhenCommandOutIsUnknown() throws Exception {
         THSensor thSensor = spy(new THSensor("TEST"));
         when(thSensor.getReadCommand()).thenReturn("echo");
+        when(thSensor.getRetryDelay()).thenReturn(0);
         thSensor.readData();
     }
 

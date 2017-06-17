@@ -6,6 +6,10 @@ public class MotorDriver {
     private GpioPinDigitalOutput pinA;
     private GpioPinDigitalOutput pinB;
 
+    public MotorDriver(String pinANumber, String pinBNumber) {
+        this(Integer.parseInt(pinANumber), Integer.parseInt(pinBNumber));
+    }
+
     public MotorDriver(int pinANumber, int pinBNumber) {
         GpioController gpio = GpioFactory.getInstance();
         pinA = gpio.provisionDigitalOutputPin(RaspiPin.getPinByAddress(pinANumber), PinState.HIGH);

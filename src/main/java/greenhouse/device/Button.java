@@ -7,6 +7,10 @@ public class Button {
     private final GpioController gpio = GpioFactory.getInstance();
     private GpioPinDigitalInput pin;
 
+    public Button(String pinNumber) {
+        this(Integer.parseInt(pinNumber));
+    }
+
     public Button(int pinNumber) {
         pin = gpio.provisionDigitalInputPin(RaspiPin.getPinByAddress(pinNumber),
                 PinPullResistance.PULL_UP);
@@ -22,6 +26,10 @@ public class Button {
                 onActivation.run();
             }
         });
+    }
+
+    public void removeAction() {
+        pin.removeAllListeners();
     }
 
     public boolean isActive() {

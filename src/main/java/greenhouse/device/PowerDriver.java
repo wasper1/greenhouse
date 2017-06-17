@@ -5,6 +5,10 @@ import com.pi4j.io.gpio.*;
 public class PowerDriver {
     private GpioPinDigitalOutput pin;
 
+    public PowerDriver(String pinNumber) {
+        this(Integer.parseInt(pinNumber));
+    }
+
     public PowerDriver(int pinNumber) {
         GpioController gpio = GpioFactory.getInstance();
         pin = gpio.provisionDigitalOutputPin(RaspiPin.getPinByAddress(pinNumber), PinState.HIGH);

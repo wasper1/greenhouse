@@ -13,18 +13,18 @@ public class Button {
         pin.setShutdownOptions(true);
     }
 
-    public void setAction(Runnable onOpen, Runnable onClose) {
+    public void setAction(Runnable onActivation, Runnable onDeactivation) {
         pin.removeAllListeners();
         pin.addListener((GpioPinListenerDigital) event -> {
             if (event.getState().isHigh()) {
-                onOpen.run();
+                onDeactivation.run();
             } else {
-                onClose.run();
+                onActivation.run();
             }
         });
     }
 
-    public boolean isClosed() {
+    public boolean isActive() {
         return pin.isLow();
     }
 }

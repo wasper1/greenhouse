@@ -1,11 +1,13 @@
 package greenhouse;
 
+import com.pi4j.io.gpio.GpioFactory;
 import greenhouse.device.Button;
 import greenhouse.device.MotorDriver;
 import greenhouse.device.PowerDriver;
 import greenhouse.device.THSensor;
 import org.apache.log4j.Logger;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -15,8 +17,11 @@ public class Greenhouse {
     private String propertiesFileName;
 
     public static void main(String[] args) {
-        logger.info("Greenhouse");
-        Greenhouse greenhouse = new Greenhouse("greenhouse.properties");
+        if (args.length != 1) {
+            logger.error("You must specify argument with path to config file");
+            System.exit(1);
+        }
+        Greenhouse greenhouse = new Greenhouse(args[0]);
         greenhouse.routine();
     }
 
@@ -24,15 +29,10 @@ public class Greenhouse {
         this.propertiesFileName = propertiesFileName;
     }
 
-    private Properties loadProperties(String filename) {
+    private Properties loadProperties(String filePath) {
         Properties prop = new Properties();
         try {
-            InputStream input = this.getClass().getClassLoader().getResourceAsStream(filename);
-            if (input == null) {
-                logger.error("Unable to find properties " + filename);
-                System.exit(1);
-            }
-
+            InputStream input = new FileInputStream(filePath);
             prop.load(input);
             input.close();
 
@@ -69,5 +69,8 @@ public class Greenhouse {
         if (temperature < minTemperature && door.isOpened()) {
             door.close();
         }
+        door.waitUntilFinished();
+        logger.debug("All tasks finished - shutdown");
+        GpioFactory.getInstance().shutdown();
     }
 }

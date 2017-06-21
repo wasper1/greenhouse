@@ -3,7 +3,7 @@ package greenhouse.device;
 import com.pi4j.io.gpio.*;
 
 public class PowerDriver {
-    private GpioPinDigitalOutput pin;
+    private final GpioPinDigitalOutput pin;
 
     public PowerDriver(String pinNumber) {
         this(Integer.parseInt(pinNumber));

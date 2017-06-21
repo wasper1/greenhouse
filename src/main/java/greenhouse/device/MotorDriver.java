@@ -3,8 +3,8 @@ package greenhouse.device;
 import com.pi4j.io.gpio.*;
 
 public class MotorDriver {
-    private GpioPinDigitalOutput pinA;
-    private GpioPinDigitalOutput pinB;
+    private final GpioPinDigitalOutput pinA;
+    private final GpioPinDigitalOutput pinB;
 
     public MotorDriver(String pinANumber, String pinBNumber) {
         this(Integer.parseInt(pinANumber), Integer.parseInt(pinBNumber));

@@ -11,14 +11,15 @@ import java.util.concurrent.TimeUnit;
 
 public class TwoLimitDoor implements Door {
     private final static Logger logger = Logger.getLogger(TwoLimitDoor.class);
-    private Button openedSensor;
-    private Button closedSensor;
-    private PowerDriver powerDriver;
-    private MotorDriver motorDriver;
+    private final Button openedSensor;
+    private final Button closedSensor;
+    private final PowerDriver powerDriver;
+    private final MotorDriver motorDriver;
     private Thread emergencyStop;
-    private int timeout;
-    CountDownLatch latch = new CountDownLatch(0);
+    private final int timeout;
+    private CountDownLatch latch = new CountDownLatch(0);
 
+    @SuppressWarnings("SameParameterValue")
     public TwoLimitDoor(Button openedSensor, Button closedSensor, PowerDriver powerDriver, MotorDriver motorDriver, int timeout) {
         this.openedSensor = openedSensor;
         this.closedSensor = closedSensor;

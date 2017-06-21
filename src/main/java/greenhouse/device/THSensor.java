@@ -9,12 +9,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("ALL")
 public class THSensor {
     private final static Logger logger = Logger.getLogger(THSensor.class);
     private final String READ_COMMAND = "readDTH11";
     private final int RETRY_COUNT = 30;
     private final int RETRY_DELAY = 2000;
-    private String pinNumber;
+    private final String pinNumber;
     private double temperature;
     private double humidity;
 

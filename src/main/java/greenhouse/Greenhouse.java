@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Greenhouse {
+class Greenhouse {
     private final static Logger logger = Logger.getLogger(Greenhouse.class);
-    private String propertiesFileName;
+    private final String propertiesFileName;
 
     public static void main(String[] args) {
         if (args.length != 1) {

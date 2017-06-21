@@ -11,14 +11,13 @@ import java.util.concurrent.TimeUnit;
 
 public class OneLimitDoor implements Door {
     private final static Logger logger = Logger.getLogger(OneLimitDoor.class);
-    private Button closedSensor;
-    private PowerDriver powerDriver;
-    private MotorDriver motorDriver;
-    private Thread openingThread;
+    private final Button closedSensor;
+    private final PowerDriver powerDriver;
+    private final MotorDriver motorDriver;
     private Thread emergencyStop;
-    private int openTime;
-    private int timeout;
-    CountDownLatch latch = new CountDownLatch(0);
+    private final int openTime;
+    private final int timeout;
+    private CountDownLatch latch = new CountDownLatch(0);
 
     public OneLimitDoor(int openTime, Button closedSensor, PowerDriver powerDriver, MotorDriver motorDriver, int timeout) {
         this.openTime = openTime;
@@ -46,7 +45,7 @@ public class OneLimitDoor implements Door {
         }
         removeAllListeners();
         latch = new CountDownLatch(1);
-        openingThread = new Thread(() -> {
+        Thread openingThread = new Thread(() -> {
             Uninterruptibles.sleepUninterruptibly(this.openTime, TimeUnit.SECONDS);
             motorDriver.stop();
             powerDriver.setActive(false);

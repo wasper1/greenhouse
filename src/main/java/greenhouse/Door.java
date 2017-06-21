@@ -1,6 +1,6 @@
 package greenhouse;
 
-public interface Door {
+interface Door {
     void open();
     void close();
 

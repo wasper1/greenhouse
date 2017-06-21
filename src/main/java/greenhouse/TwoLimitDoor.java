@@ -25,8 +25,14 @@ public class TwoLimitDoor implements Door {
         this.timeout = timeout;
     }
 
+    @Override
+    public boolean isOpened() {
+        return openedSensor.isActive();
+    }
+
+    @Override
     public void open() {
-        if (openedSensor.isActive()) {
+        if (isOpened()) {
             logger.error("Trying to open opened doors");
             return;
         }
@@ -40,16 +46,14 @@ public class TwoLimitDoor implements Door {
 
         emergencyStop = new Thread(() -> {
             for (int i = 0; i < timeout; i++) {
+                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
                 if (Thread.currentThread().isInterrupted()) {
                     return;
                 }
-                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
             }
-            if (!openedSensor.isActive()) {
-                motorDriver.stop();
-                powerDriver.setActive(false);
-                logger.error("Door opening emergency stop - timeout reached");
-            }
+            motorDriver.stop();
+            powerDriver.setActive(false);
+            logger.error("Door opening emergency stop - timeout reached");
         });
         emergencyStop.start();
 
@@ -62,8 +66,14 @@ public class TwoLimitDoor implements Door {
         closedSensor.removeAction();
     }
 
+    @Override
+    public boolean isClosed() {
+        return closedSensor.isActive();
+    }
+
+    @Override
     public void close() {
-        if (closedSensor.isActive()) {
+        if (isClosed()) {
             logger.error("Trying to close closed doors");
             return;
         }
@@ -82,11 +92,9 @@ public class TwoLimitDoor implements Door {
                 }
                 Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
             }
-            if (!closedSensor.isActive()) {
-                motorDriver.stop();
-                powerDriver.setActive(false);
-                logger.error("Door closing emergency stop - timeout reached");
-            }
+            motorDriver.stop();
+            powerDriver.setActive(false);
+            logger.error("Door closing emergency stop - timeout reached");
         });
         emergencyStop.start();
 

@@ -76,4 +76,32 @@ public class TwoLimitDoorTest {
         verifyZeroInteractions(powerDriver);
         verifyZeroInteractions(motorDriver);
     }
+
+
+    @Test
+    public void shouldNotWaitWhenNoActiveProcessing() throws Exception {
+        TwoLimitDoor twoLimitDoor = new TwoLimitDoor(openedSensor, closedSensor, powerDriver, motorDriver, 1);
+        twoLimitDoor.waitUntilFinished();
+    }
+
+    @Test
+    public void shouldWaitWhenOpening() throws Exception {
+        TwoLimitDoor twoLimitDoor = new TwoLimitDoor(openedSensor, closedSensor, powerDriver, motorDriver, 1);
+
+        twoLimitDoor.open();
+        twoLimitDoor.waitUntilFinished();
+        verify(powerDriver).setActive(false);
+        verify(motorDriver).stop();
+    }
+
+    @Test
+    public void shouldWaitWhenClosing() throws Exception {
+        TwoLimitDoor twoLimitDoor = new TwoLimitDoor(openedSensor, closedSensor, powerDriver, motorDriver, 1);
+
+        twoLimitDoor.close();
+        twoLimitDoor.waitUntilFinished();
+
+        verify(powerDriver).setActive(false);
+        verify(motorDriver).stop();
+    }
 }

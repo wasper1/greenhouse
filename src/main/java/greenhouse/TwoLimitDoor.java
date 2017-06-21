@@ -6,6 +6,7 @@ import greenhouse.device.MotorDriver;
 import greenhouse.device.PowerDriver;
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class TwoLimitDoor implements Door {
@@ -16,6 +17,7 @@ public class TwoLimitDoor implements Door {
     private MotorDriver motorDriver;
     private Thread emergencyStop;
     private int timeout;
+    CountDownLatch latch = new CountDownLatch(0);
 
     public TwoLimitDoor(Button openedSensor, Button closedSensor, PowerDriver powerDriver, MotorDriver motorDriver, int timeout) {
         this.openedSensor = openedSensor;
@@ -37,6 +39,7 @@ public class TwoLimitDoor implements Door {
             return;
         }
         removeAllListeners();
+        latch = new CountDownLatch(1);
         openedSensor.setAction(() -> {
             motorDriver.stop();
             powerDriver.setActive(false);
@@ -48,12 +51,15 @@ public class TwoLimitDoor implements Door {
             for (int i = 0; i < timeout; i++) {
                 Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
                 if (Thread.currentThread().isInterrupted()) {
+                    logger.debug("Exit emergency thread due to trigger hit");
+                    latch.countDown();
                     return;
                 }
             }
+            logger.error("Door opening emergency stop - timeout reached");
             motorDriver.stop();
             powerDriver.setActive(false);
-            logger.error("Door opening emergency stop - timeout reached");
+            latch.countDown();
         });
         emergencyStop.start();
 
@@ -78,6 +84,7 @@ public class TwoLimitDoor implements Door {
             return;
         }
         removeAllListeners();
+        latch = new CountDownLatch(1);
         closedSensor.setAction(() -> {
             motorDriver.stop();
             powerDriver.setActive(false);
@@ -88,17 +95,29 @@ public class TwoLimitDoor implements Door {
         emergencyStop = new Thread(() -> {
             for (int i = 0; i < timeout; i++) {
                 if (Thread.currentThread().isInterrupted()) {
+                    logger.debug("Exit emergency thread due to trigger hit");
+                    latch.countDown();
                     return;
                 }
                 Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
             }
+            logger.error("Door closing emergency stop - timeout reached");
             motorDriver.stop();
             powerDriver.setActive(false);
-            logger.error("Door closing emergency stop - timeout reached");
+            latch.countDown();
         });
         emergencyStop.start();
 
         motorDriver.goBackward();
         powerDriver.setActive(true);
+    }
+
+    @Override
+    public void waitUntilFinished() {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.error("Wait error", e);
+        }
     }
 }

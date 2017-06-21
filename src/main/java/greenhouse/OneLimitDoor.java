@@ -6,6 +6,7 @@ import greenhouse.device.MotorDriver;
 import greenhouse.device.PowerDriver;
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class OneLimitDoor implements Door {
@@ -17,6 +18,7 @@ public class OneLimitDoor implements Door {
     private Thread emergencyStop;
     private int openTime;
     private int timeout;
+    CountDownLatch latch = new CountDownLatch(0);
 
     public OneLimitDoor(int openTime, Button closedSensor, PowerDriver powerDriver, MotorDriver motorDriver, int timeout) {
         this.openTime = openTime;
@@ -43,11 +45,12 @@ public class OneLimitDoor implements Door {
             return;
         }
         removeAllListeners();
-
+        latch = new CountDownLatch(1);
         openingThread = new Thread(() -> {
             Uninterruptibles.sleepUninterruptibly(this.openTime, TimeUnit.SECONDS);
             motorDriver.stop();
             powerDriver.setActive(false);
+            latch.countDown();
         });
         openingThread.start();
 
@@ -65,6 +68,7 @@ public class OneLimitDoor implements Door {
             return;
         }
         removeAllListeners();
+        latch = new CountDownLatch(1);
         closedSensor.setAction(() -> {
             motorDriver.stop();
             powerDriver.setActive(false);
@@ -75,6 +79,8 @@ public class OneLimitDoor implements Door {
         emergencyStop = new Thread(() -> {
             for (int i = 0; i < timeout; i++) {
                 if (Thread.currentThread().isInterrupted()) {
+                    logger.debug("Exit emergency thread due to trigger hit");
+                    latch.countDown();
                     return;
                 }
                 Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
@@ -82,10 +88,20 @@ public class OneLimitDoor implements Door {
             motorDriver.stop();
             powerDriver.setActive(false);
             logger.error("Door closing emergency stop - timeout reached");
+            latch.countDown();
         });
         emergencyStop.start();
 
         motorDriver.goBackward();
         powerDriver.setActive(true);
+    }
+
+    @Override
+    public void waitUntilFinished() {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.error("Wait error", e);
+        }
     }
 }

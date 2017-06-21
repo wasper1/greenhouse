@@ -7,4 +7,6 @@ public interface Door {
     boolean isOpened();
 
     boolean isClosed();
+
+    void waitUntilFinished();
 }

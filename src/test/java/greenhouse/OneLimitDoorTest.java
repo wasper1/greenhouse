@@ -75,4 +75,31 @@ public class OneLimitDoorTest {
         verifyZeroInteractions(powerDriver);
         verifyZeroInteractions(motorDriver);
     }
+
+    @Test
+    public void shouldNotWaitWhenNoActiveProcessing() throws Exception {
+        Door door = new OneLimitDoor(0, closedSensor, powerDriver, motorDriver, 1);
+        door.waitUntilFinished();
+    }
+
+    @Test
+    public void shouldWaitWhenOpening() throws Exception {
+        when(closedSensor.isActive()).thenReturn(true);
+        Door door = new OneLimitDoor(1, closedSensor, powerDriver, motorDriver, 1);
+
+        door.open();
+        door.waitUntilFinished();
+        verify(powerDriver).setActive(false);
+        verify(motorDriver).stop();
+    }
+
+    @Test
+    public void shouldWaitWhenClosing() throws Exception {
+        Door door = new OneLimitDoor(0, closedSensor, powerDriver, motorDriver, 1);
+
+        door.close();
+        door.waitUntilFinished();
+        verify(powerDriver).setActive(false);
+        verify(motorDriver).stop();
+    }
 }

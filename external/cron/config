@@ -1,0 +1,1 @@
+*/5 * * * * /home/pi/greenhouse/bin/start.sh >> /home/pi/greenhouse.log

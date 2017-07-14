@@ -1,1 +1,2 @@
-*/5 * * * * /home/pi/greenhouse/bin/start.sh >> /home/pi/greenhouse.log
+*/5 * * * * /home/pi/greenhouse/bin/start.sh >> /home/pi/greenhouse.log 2>&1
+1 * * * * /home/pi/greenhouse/external/rebuild/rebuild.sh /home/pi/greenhouse >> /home/pi/rebuild.log 2>&1

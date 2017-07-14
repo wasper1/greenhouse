@@ -64,9 +64,11 @@ class Greenhouse {
         double humidity = thSensor.getHumidity();
         logger.info("Temperature=" + temperature + "Humidity=" + humidity);
         if (temperature > maxTemperature && door.isClosed()) {
+            logger.info("Opening the door");
             door.open();
         }
         if (temperature < minTemperature && door.isOpened()) {
+            logger.info("Closing the door");
             door.close();
         }
         door.waitUntilFinished();

@@ -37,7 +37,7 @@ public class THSensor {
                 break;
             } else {
                 Uninterruptibles.sleepUninterruptibly(getRetryDelay(), TimeUnit.MILLISECONDS);
-                logger.info("Sensor returned invalid data in try " + i);
+                logger.debug("Sensor returned invalid data in try " + i);
             }
         }
         parseData(data);
